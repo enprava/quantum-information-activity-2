@@ -1,22 +1,53 @@
 \section{BB84 con estados señuelo}
 
+En esta sección se evalúa la variante de BB84 con estados señuelo (\emph{decoy states}), una modificación metodológica diseñada para cerrar la brecha entre el modelo teórico ideal y las limitaciones de la tecnología de emisión actual. A continuación, se examinan su contexto de desarrollo, las modificaciones en su flujo operativo respecto al protocolo original, un escenario práctico simulado, así como el balance de sus ventajas operativas y limitaciones tecnológicas remanentes.
+
 \subsection{Contexto y propósito}
+La motivación detrás de esta variante radica en la inexistencia práctica de fuentes de fotón único perfectas en entornos comerciales \citep{gisin2002, lo2014}. En los despliegues reales, Alice suele emplear fuentes de pulsos coherentes atenuados (WCP, \emph{Weak Coherent Pulses}) que emiten fotones siguiendo una distribución estadística de Poisson, lo que implica una probabilidad no nula de que algunos pulsos contengan múltiples fotones en el mismo estado cuántico \citep{lutkenhaus2002}. Esta debilidad permite al espía ejecutar el ataque de división de número de fotones (PNS, \emph{Photon-Number-Splitting}), mediante el cual intercepta los fotones excedentes sin alterar el estado del fotón remanente que llega a Bob, comprometiendo críticamente la seguridad del canal \citep{brassard2000pns}. 
+
+La técnica de los estados señuelo, propuesta inicialmente por \cite{hwang2003} y formalizada matemáticamente por \cite{lo2005} y \cite{wang2005}, resuelve esta vulnerabilidad sin necesidad de modificar el hardware de detección. Su propósito es introducir pulsos de control con diferentes intensidades medias para estimar con precisión matemática las fluctuaciones estadísticas y las pérdidas del canal óptico, desacoplando la tasa de error observada de la seguridad de la clave final.
 
 \subsection{Funcionamiento del protocolo}
+El flujo operativo base comparte la estructura cuántica de preparación y medida del protocolo BB84 estándar \citep{bennett1984, scarani2009}, pero introduce una variación crítica en la etapa de emisión. En lugar de utilizar una intensidad de luz constante para todos los pulsos, Alice conmuta de forma aleatoria la potencia de su fuente láser entre varios niveles de intensidad media predefinidos: habitualmente denominados pulso de señal ($\mu$), pulso señuelo ($\nu$) y pulso de vacío ($0$). Bob realiza las mediciones de forma convencional utilizando sus bases aleatorias, sin conocer a qué grupo de intensidad pertenece cada pulso recibido.
 
+Una vez finalizada la transmisión cuántica y ejecutado el cribado clásico de bases, Alice revela a través del canal clásico autenticado el nivel de intensidad asignado a cada ronda \citep{lo2005}. Dado que las pérdidas por atenuación en la fibra óptica afectan de igual manera a cualquier pulso luminoso independientemente de su intensidad, la tasa de detección o ganancia de Bob ($Y_n$) para cada fotón debe guardar una relación estadística proporcional y predecible. Si un atacante intenta extraer fotones mediante un ataque PNS, alterará de forma inevitable las estadísticas de ganancia y la tasa de error de fase (\emph{phase error rate}) de los estados señuelo respecto a los de señal \citep{wang2005}, permitiendo a Alice y Bob descubrir la intrusión mediante el cálculo de los límites inferiores de los pulsos monofotónicos durante el postprocesamiento de los datos.
 
 \subsection{Ventajas principales}
+El impacto de los estados señuelo en la criptografía cuántica práctica se fundamenta en su capacidad para aproximar el rendimiento de los sistemas reales al límite de seguridad teórico \citep{scarani2009, lo2014}. Sus principales fortalezas se resumen a continuación:
 \begin{itemize}
-    \item a
-    \item b
-    \item c
+    \item Inmunidad rigurosa frente al ataque PNS, garantizando la seguridad incondicional (\emph{information-theoretic security}) incluso al utilizar fuentes láser atenuadas convencionales \citep{lo2005, wang2005}.
+    \item Incremento drástico tanto en la distancia máxima de transmisión segura como en la tasa de generación de clave final (\emph{key rate}) en canales con altas pérdidas ópticas \citep{scarani2004}.
+    \item Viabilidad de implementación inmediata sobre la infraestructura de hardware existente de BB84, requiriendo únicamente modificaciones a nivel de lógica de control de software y la adición de moduladores de intensidad en el bloque de emisión.
 \end{itemize}
 
 \subsection{Limitaciones y riesgos}
+A pesar de consolidar la seguridad de las fuentes ópticas, esta variante traslada la complejidad analítica hacia otros componentes del sistema, abriendo nuevos vectores de vulnerabilidad práctica \citep{scarani2009, lydersen2010}. Los desafíos y riesgos remanentes se detallan a continuación:
 \begin{itemize}
-    \item a
-    \item b
-    \item c
+    \item Incremento en la carga computacional del postprocesamiento debido a la necesidad de resolver ecuaciones de estimación estadística y análisis de clave finita (\emph{finite-key analysis}) más complejas para cada nivel de intensidad.
+    \item Vulnerabilidad latente ante ataques de canal lateral (\emph{side-channel attacks}) dirigidos a las imperfecciones de los detectores de Bob o fallos de calibración en los moduladores de Alice, conocidos como ataques de hackeo por intensidad \citep{lydersen2010}.
+    \item Dependencia extrema de la estabilidad temporal de la fuente láser; si las fluctuaciones reales de la intensidad media superan los márgenes estadísticos asumidos en el modelo matemático, el sistema puede generar estimaciones de seguridad erróneas o falsos positivos.
 \end{itemize}
 
 \subsection{Ejemplo práctico}
+Para ilustrar el funcionamiento de este mecanismo frente a una amenaza, se considera un escenario donde Alice desea enviar una clave y utiliza tres niveles de intensidad: señal ($\mu$), señuelo ($\nu$) y vacío ($0$). Para este ejemplo simplificado de seis rondas, se asume que un atacante (Eva) monitoriza el canal e intenta aplicar el ataque PNS únicamente cuando detecta pulsos multifotónicos.
+
+\begin{table}[h]
+    \centering
+    \small
+    \begin{tabular}{c c c c c c}
+        \hline\hline
+        Ronda & Intensidad & Coincidencia & Estado del pulso & Acción de Eva & Resultado de Bob \\
+        \hline
+        1 & Señal ($\mu$) & Sí & Monofotónico & Bloquea & No detectado \\
+        2 & Señuelo ($\nu$) & Sí & Monofotónico & Permite pasar & Detectado correctamente \\
+        3 & Vacío ($0$) & Sí & Sin fotones & Ninguna & No detectado \\
+        4 & Señal ($\mu$) & Sí & Multifotónico & Divide y mide fotón & Detectado correctamente \\
+        5 & Señuelo ($\nu$) & No & Monofotónico & Permite pasar & Se descarta por base \\
+        6 & Señal ($\mu$) & Sí & Monofotónico & Permite pasar & Detectado correctamente \\
+        \hline
+    \end{tabular}
+    \caption[Ejemplo operativo con estados señuelo]{Simulación del comportamiento del canal con estados señuelo ante un intento de ataque. Fuente: elaboración propia.}
+    \label{tab:decoy_ejemplo}
+\end{table}
+
+Tras el cribado de bases clásico expuesto en la Tabla~\ref{tab:decoy_ejemplo}, Alice revela qué rondas correspondían a estados señuelo y de vacío. Al analizar estadísticamente los datos, Alice y Bob calcularán cuántos pulsos señuelo ($\nu$) llegaron al detector en relación con los pulsos de señal ($\mu$). En un canal normal con pérdidas homogéneas, ambos tipos de pulsos se atenuarían de forma proporcional. Sin embargo, como Eva alteró selectivamente la transmisión al interceptar o bloquear fotones basándose en el número de fotones por pulso (afectando de forma desproporcionada a la intensidad $\mu$), las estadísticas de ganancia finales de los estados señuelo no coincidirán con las predicciones teóricas. Al constatar esta anomalía estadística en las rondas de control, los usuarios detectan la manipulación del canal y abortan la generación de la clave.

@@ -1,7 +1,40 @@
 \chapter{Introducción}
 
+La seguridad de las infraestructuras de comunicación globales descansa de forma casi exclusiva sobre algoritmos de criptografía asimétrica clásicos, cuya viabilidad operativa se fundamenta en la intratabilidad computacional de ciertos problemas matemáticos, como la factorización de números enteros o el cálculo de logaritmos discretos. El desarrollo sostenido de la computación cuántica y la maduración de algoritmos específicos representan una ruptura paradigmática para este ecosistema de seguridad, al demostrarse que dichos problemas pueden resolverse en tiempo polinómico \citep{shor1994}, impulsando la búsqueda de alternativas tecnológicas capaces de garantizar la confidencialidad de la información a largo plazo \citep{nielsen2010}. En este contexto, la distribución de claves cuánticas (\emph{Quantum Key Distribution}, QKD) emerge como una solución disruptiva, sustituyendo los supuestos de complejidad computacional por las leyes inmutables de la mecánica cuántica \citep{gisin2002, scarani2009}.
+
 \section{Motivación y justificación}
+
+La principal motivación de este Trabajo radica en la inminente obsolescencia de los sistemas criptográficos convencionales frente al avance de las tecnologías cuánticas. El diseño de algoritmos cuánticos específicos ha demostrado conceptualmente que los pilares de la seguridad digital actual pueden ser vulnerados en tiempo polinómico una vez que se disponga de un computador cuántico con tolerancia a fallos a gran escala \citep{shor1994}. Este escenario plantea una amenaza crítica no solo para las comunicaciones en tiempo real, sino también para los datos históricos cifrados bajo esquemas tradicionales que están siendo interceptados en la actualidad con el propósito de ser descifrados de manera retroactiva en el futuro.
+
+Frente a esta vulnerabilidad, la criptografía cuántica ofrece un cambio de paradigma al proporcionar seguridad incondicional desde la perspectiva de la teoría de la información (\emph{information-theoretic security}). En un esquema QKD, la confidencialidad de las claves generadas no depende de la capacidad de cómputo del adversario, sino de principios físicos fundamentales de la mecánica cuántica, tales como el principio de incertidumbre de Heisenberg, el teorema de no clonación \citep{wootters1982} y el colapso del estado cuántico tras la medición. Cualquier intento de interceptación por parte de un espía altera de forma inevitable los estados cuánticos transmitidos, dejando una huella estadística que los usuarios legítimos pueden cuantificar y evaluar en tiempo real \citep{gisin2002}.
+
+Dentro del ecosistema QKD, los protocolos de variable discreta (\emph{Discrete-Variable QKD}, DV-QKD) representan el enfoque tecnológicamente más maduro y ampliamente desplegado en redes comerciales e institucionales \citep{scarani2009, lo2014}. Sin embargo, la transición desde los modelos teóricos ideales —donde se asumen fuentes de fotón único y detectores perfectos— hacia los sistemas de ingeniería reales introduce desalineaciones ópticas, pérdidas en los canales de fibra y componentes multifotónicos que abren la puerta a diversos vectores de ataque, como la división del número de fotones o ataques de canal lateral \citep{brassard2000pns, lydersen2010}. 
+
+La justificación de este estudio se sustenta en la necesidad de analizar de forma crítica y estructurada cómo las diferentes variantes de protocolos DV-QKD gestionan estas imperfecciones de hardware, evaluando el equilibrio existente entre la seguridad matemática demostrable, la carga computacional en el postprocesamiento clásico y la viabilidad técnica de su implementación sobre las infraestructuras de telecomunicaciones actuales.
 
 \section{Planteamiento del Trabajo}
 
+El presente Trabajo se plantea como una investigación de carácter analítico y comparativo centrada en los mecanismos esenciales, vulnerabilidades físicas y criterios de selección de los principales protocolos que integran la familia de variable discreta. Lejos de buscar una demostración formal abstracta de la seguridad composable de cada esquema, el enfoque de este estudio adopta una perspectiva metodológica e ingenieril orientada a la toma de decisiones técnicas en entornos de red reales.
+
+Para guiar la investigación de manera sistemática, el desarrollo del Trabajo se articula en torno a tres ejes fundamentales:
+\begin{enumerate}
+    \item \textbf{Estandarización del análisis:} Establecer un marco de evaluación homogéneo aplicable a cada protocolo estudiado, garantizando que variables críticas como los supuestos de confianza, los requisitos de hardware óptico, la eficiencia del cribado y las tasas de error tolerables sean contrastadas bajo un mismo estándar metodológico.
+    \item \textbf{Modelado y ejemplificación práctica:} Reconstruir los flujos operativos y las fases de postprocesamiento clásico (cribado, estimación de errores, reconciliación y amplificación de la privacidad) mediante escenarios de aplicación de diseño propio. Estos ejemplos prácticos digitalizan la física de los protocolos en casos simplificados pero rigurosos para visibilizar el comportamiento del canal ante la presencia de ruido o espionaje pasivo.
+    \item \textbf{Evaluación de la seguridad práctica:} Analizar la robustez de cada esquema frente a las amenazas físicas del mundo real, determinando en qué condiciones operativas (distancia, atenuación del canal, estabilidad del emisor) un protocolo específico resulta preferible frente a sus alternativas.
+\end{enumerate}
+
+A través de este planteamiento, el Trabajo aspira a construir una herramienta de consulta estructurada que traduzca la teoría fundacional de la información cuántica en conclusiones técnicas útiles para el despliegue e integración de redes criptográficas seguras.
+
 \section{Estructura del Trabajo}
+
+Para cumplir de manera ordenada con los objetivos propuestos, el documento se estructura en capítulos interconectados que guían al lector desde los fundamentos teóricos hasta la síntesis comparativa final:
+
+El \textbf{Capítulo 1: Introducción} contextualiza el problema global de la seguridad de la información frente al auge de las tecnologías cuánticas, definiendo la motivación, el planteamiento metodológico y el alcance analítico del estudio.
+
+El \textbf{Capítulo 2: Fundamentos Teóricos} formaliza las herramientas matemáticas y los principios físicos de la mecánica cuántica requeridos para comprender la manipulación de la información en DV-QKD. Se examina la representación de estados en el espacio de Hilbert utilizando la notación de Dirac, las matrices de Pauli, la esfera de Bloch, así como las métricas clásicas para evaluar la degradación de la señal, tales como la ganancia del canal y la tasa de error en los bits cuánticos (QBER).
+
+El \textbf{Capítulo 3: Análisis de Protocolos de Variable Discreta} constituye el núcleo del Trabajo. En él se aplica el marco analítico normalizado de manera consecutiva a los esquemas de referencia. Cada bloque integra de manera sistemática su contexto histórico, su flujo de funcionamiento cuántico y clásico, una evaluación analítica de sus fortalezas y debilidades, y un escenario práctico de diseño propio con sus respectivas tablas de cribado y modelado de ataques.
+
+El \textbf{Capítulo 4: Discusión Comparativa} recopila los datos extraídos del capítulo anterior para articular una correlación transversal. A través de una tabla comparativa global, se evalúan de forma conjunta los requisitos de infraestructura, la tolerancia a las pérdidas, la eficiencia de los recursos cuánticos y la robustez frente a vectores de ataque específicos (como el ataque PNS o los ataques dirigidos a detectores).
+
+El \textbf{Capítulo 5: Conclusiones} sintetiza los hallazgos más relevantes de la investigación, aportando recomendaciones técnicas para la selección de protocolos en casos de despliegue realistas, identificando las tendencias actuales en el mercado de las telecomunicaciones cuánticas y proponiendo futuras líneas de investigación dentro del área.

@@ -1,14 +1,18 @@
 \section{Protocolo BB84}
 
+En esta sección se analiza en detalle el protocolo BB84, que debe su nombre a \cite{bennett1984}. El análisis abarca desde su propuesta fundacional y su flujo operativo, complementado con un escenario práctico de diseño propio, hasta la evaluación crítica de sus ventajas tecnológicas y limitaciones de seguridad frente a canales reales y posibles vectores de ataque.
+
 \subsection{Contexto y propósito}
-BB84 es el protocolo de referencia de la criptografía cuántica de variable discreta. Fue propuesto por \cite{bennett1984} y pertenece a la familia de preparación y medida \citep{gisin2002,scarani2009}. Su importancia no se limita a ser el primer protocolo QKD ampliamente reconocido: también sirve como modelo pedagógico y como base para variantes modernas, como BB84 con estados señuelo \citep{hwang2003,lo2005,wang2005}.
+El protocolo BB84, es la referencia de la criptografía cuántica de variable discreta. Pertenece a la familia de preparación y medida \citep{gisin2002,scarani2009}. Su importancia no se limita a ser el primer protocolo QKD ampliamente reconocido: también sirve como modelo pedagógico y como base para variantes modernas, como BB84 con estados señuelo \citep{hwang2003,lo2005,wang2005}.
 
 \subsection{Funcionamiento del protocolo}
-El funcionamiento de BB84 puede entenderse como una secuencia de rondas independientes. En cada ronda, Alicia no envía directamente un bit clásico, sino un cúbit preparado de una forma concreta. Para ello elige dos elementos al azar: el valor del bit, que puede ser 0 o 1, y la base de codificación. En una descripción con polarización, la base rectilínea puede asociar el bit 0 a la polarización horizontal y el bit 1 a la vertical; la base diagonal puede asociar el bit 0 a 45 grados y el bit 1 a 135 grados \citep{bennett1984,gisin2002}.
+El funcionamiento de BB84 puede entenderse como una secuencia de rondas independientes. En cada ronda, Alice no envía directamente un bit clásico, sino un cúbit preparado de una forma concreta. Para ello elige dos elementos al azar: el valor del bit, que puede ser 0 o 1, y la base de codificación \citep{bennett1984,gisin2002}.
 
-Bob recibe cada cúbit sin saber qué base ha usado Alicia. Por tanto, también escoge al azar una base de medida. Si Bob elige la misma base que Alicia, obtiene el bit correcto con alta probabilidad en un canal ideal. Si elige la base equivocada, su resultado es esencialmente aleatorio y esa ronda no será útil para formar la clave \citep{bennett1984,scarani2009}.
+Bob recibe cada cúbit sin saber qué base ha usado Alice. Por tanto, también escoge al azar una base de medida. Si Bob elige la misma base que Alice, obtiene el bit correcto con alta probabilidad en un canal ideal. Si elige la base equivocada, su resultado es esencialmente aleatorio y esa ronda no será útil para formar la clave \citep{bennett1984,scarani2009}.
 
-Una vez transmitidos muchos cúbits, Alicia y Bob usan el canal clásico autenticado para comparar solo las bases empleadas, nunca los valores de los bits. Las rondas en las que ambos usaron bases distintas se descartan. Las rondas en las que usaron la misma base se conservan y forman una clave bruta, que todavía debe verificarse y depurarse \citep{gisin2002,scarani2009}.
+Una vez transmitidos muchos cúbits, Alice y Bob usan el canal clásico autenticado para comparar solo las bases empleadas, nunca los valores de los bits. Las rondas en las que ambos usaron bases distintas se descartan. Las rondas en las que usaron la misma base se conservan y forman una clave bruta, que todavía debe verificarse y depurarse \citep{gisin2002,scarani2009}.
+
+Este mecanismo de cribado es el que otorga seguridad al protocolo frente a un observador malicioso. Si un espía intentara interceptar los cúbits en el canal cuántico, se vería obligado a medirlos; cuando eligiera una base incompatible con la de Alice, modificaría inevitablemente el estado del cúbit reenviado a Bob y aumentaría la tasa de error en las rondas conservadas, revelando así su presencia durante la fase de estimación de error.
 
 
 \begin{figure}[h]
@@ -19,11 +23,11 @@ Una vez transmitidos muchos cúbits, Alicia y Bob usan el canal clásico autenti
         canal/.style={draw, rounded corners, align=center, minimum width=2.8cm, minimum height=0.8cm, fill=gray!10},
         flecha/.style={-{Latex[length=2mm]}, thick}
     ]
-        \node[paso] (a1) {Alicia\\elige bit y base};
+        \node[paso] (a1) {Alice\\elige bit y base};
         \node[canal, right=of a1] (q) {canal cuántico\\cúbit};
         \node[paso, right=of q] (b1) {Bob\\elige base y mide};
 
-        \node[paso, below=of a1] (a2) {Alicia anuncia\\su base};
+        \node[paso, below=of a1] (a2) {Alice anuncia\\su base};
         \node[canal, right=of a2] (c) {canal clásico\\autenticado};
         \node[paso, right=of c] (b2) {Bob anuncia\\su base};
 
@@ -45,17 +49,16 @@ Una vez transmitidos muchos cúbits, Alicia y Bob usan el canal clásico autenti
     \label{fig:bb84_flujo}
 \end{figure}
 
-La Figura~\ref{fig:bb84_flujo} resume esta lógica. El punto esencial es que Eva no conoce la base correcta durante la transmisión. Si intercepta un cúbit y lo mide, en muchas rondas elegirá una base incompatible. Al reenviar un nuevo cúbit a Bob, esa decisión introduce errores detectables en las rondas que Alicia y Bob conservan. Por ello, antes de aceptar la clave, ambos revelan públicamente una muestra de sus bits para estimar la tasa de error. Si el error es aceptable, aplican corrección de información y amplificación de privacidad; si es demasiado alto, abortan el protocolo \citep{bennett1984,scarani2009}.
-
 \subsection{Ventajas principales}
+El éxito y la vigencia del protocolo BB84 en el ámbito de la información cuántica se deben a un conjunto de propiedades teóricas y operativas que facilitan su análisis y despliegue \cite{bennett1984}. Sus principales fortalezas se resumen a continuación:
 \begin{itemize}
     \item Es conceptualmente simple y permite explicar de manera directa la relación entre medición cuántica y detección de espionaje.
-    \item Cuenta con una gran tradición de análisis teórico y experimental.
     \item Puede implementarse con distintas codificaciones físicas, como polarización, fase o tiempo de llegada.
     \item Sirve como base de protocolos prácticos con estados señuelo, más adecuados para fuentes láser atenuadas.
 \end{itemize}
 
 \subsection{Limitaciones y riesgos}
+A pesar de su solidez teórica, el traslado del protocolo BB84 a entornos de producción e ingeniería real desvela ciertas restricciones físicas y tecnológicas. Los desafíos y vulnerabilidades más críticos asociados a su implementación práctica son los siguientes:
 \begin{itemize}
     \item La versión ideal presupone fuentes de cúbits físicos bien controlados y detectores perfectos, condiciones difíciles en sistemas reales.
     \item Las fuentes láser débiles pueden emitir pulsos multifotónicos, lo que abre la puerta a ataques de división de número de fotones.
@@ -64,14 +67,14 @@ La Figura~\ref{fig:bb84_flujo} resume esta lógica. El punto esencial es que Eva
 \end{itemize}
 
 \subsection{Ejemplo práctico}
-Se supone que Alicia desea generar una clave para cifrar los resultados preliminares de un laboratorio. Para ilustrar el procedimiento, se considera un caso reducido de seis rondas. Alicia elige una secuencia de bits y bases, prepara los cúbits correspondientes y los envía a Bob. Bob, sin conocer las bases de Alicia, mide cada cúbit con una base elegida al azar.
+Se supone que Alice desea generar una clave para cifrar los resultados preliminares de un laboratorio. Para ilustrar el procedimiento, se considera un caso reducido de seis rondas. Alice elige una secuencia de bits y bases, prepara los cúbits correspondientes y los envía a Bob. Bob, sin conocer las bases de Alice, mide cada cúbit con una base elegida al azar.
 
 \begin{table}[h]
     \centering
     \small
     \begin{tabular}{c c c c c c}
         \hline\hline
-        Ronda & Bit de Alicia & Base de Alicia & Base de Bob & ¿Coinciden? & Resultado \\
+        Ronda & Bit de Alice & Base de Alice & Base de Bob & ¿Coinciden? & Resultado \\
         \hline
         1 & 0 & Rectilínea & Rectilínea & Sí & Se conserva \\
         2 & 1 & Diagonal & Rectilínea & No & Se descarta \\
@@ -85,6 +88,6 @@ Se supone que Alicia desea generar una clave para cifrar los resultados prelimin
     \label{tab:bb84_ejemplo}
 \end{table}
 
-En el caso de la Tabla~\ref{tab:bb84_ejemplo}, Alicia y Bob conservarían inicialmente las rondas 1, 3 y 4, porque en ellas ambos han usado la misma base. La clave bruta de Alicia sería, por tanto, 0, 1 y 0. En un canal ideal, Bob obtendría los mismos valores en esas rondas. Para comprobar si ha habido ruido o espionaje, podrían revelar públicamente una de las rondas conservadas, por ejemplo la ronda 3. Si ambos observan el mismo valor, continúan con las rondas restantes; si aparecen demasiadas discrepancias, abortan.
+En el caso de la Tabla~\ref{tab:bb84_ejemplo}, Alice y Bob conservarían inicialmente las rondas 1, 3 y 4, porque en ellas ambos han usado la misma base. La clave bruta de Alice sería, por tanto, 0, 1 y 0. En un canal ideal, Bob obtendría los mismos valores en esas rondas. Para comprobar si ha habido ruido o espionaje, podrían revelar públicamente una de las rondas conservadas, por ejemplo la ronda 3. Si ambos observan el mismo valor, continúan con las rondas restantes; si aparecen demasiadas discrepancias, abortan.
 
 Si Eva hubiese interceptado los cúbits, tendría que medirlos sin conocer la base correcta. Cuando eligiera una base incompatible, modificaría el estado reenviado a Bob y aumentaría la probabilidad de error en las rondas conservadas. En una ejecución real no se usarían solo seis rondas, sino miles o millones, de modo que la estimación estadística del error fuera significativa. Este ejemplo es deliberadamente pequeño y solo pretende mostrar la lógica de preparación, medición, cribado y comprobación de errores.

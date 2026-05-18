@@ -4,17 +4,17 @@ Después de la propuesta de BB84 de \cite{bennett1984}, la distribución cuánti
 
 \subsection{Contexto y propósito}
 
-El protocolo de seis estados es una extensión directa de la idea de distribución cuántica de claves por preparación y medida introducida en BB84 \citep{bennett1984}. Su formulación específica fue propuesta para usar los seis autoestados de las tres matrices de \cite{pauli1927}, es decir, dos estados por cada una de las bases asociadas a $X$, $Y$ y $Z$ \citep{bruss1998}. La motivación central es aumentar la simetría del protocolo, pues en lugar de emplear dos bases mutuamente no sesgadas, como en BB84, Alicia y Bob usan tres bases mutuamente no sesgadas, concepto introducido en la teoría cuántica por \cite{schwinger1960}.
+El protocolo de seis estados es una extensión directa de la idea de distribución cuántica de claves por preparación y medida introducida en BB84 \citep{bennett1984}. Su formulación específica fue propuesta para usar los seis autoestados de las tres matrices de \cite{pauli1927}, es decir, dos estados por cada una de las bases asociadas a $X$, $Y$ y $Z$ \citep{bruss1998}. La motivación central es aumentar la simetría del protocolo, pues en lugar de emplear dos bases mutuamente no sesgadas, como en BB84, Alice y Bob usan tres bases mutuamente no sesgadas, concepto introducido en la teoría cuántica por \cite{schwinger1960}.
 
 Esta mayor simetría puede visualizarse en la esfera de \cite{bloch1946}, que es una representación geométrica del estado de un sistema cuántico de dos niveles. En esa representación, las tres bases asociadas a $X$, $Y$ y $Z$ corresponden a tres ejes distintos; por ello, una medición no autorizada puede introducir perturbaciones detectables en más direcciones de análisis. Así, el protocolo de seis estados se estudia como una alternativa conceptualmente cercana a BB84, pero con una estimación de error más informativa frente a ataques individuales o incoherentes \citep{bruss1998,bechmann1999}.
 
 \subsection{Funcionamiento del protocolo}
 
-En cada ronda, Alicia elige aleatoriamente un bit clásico y una de tres bases de preparación. Si usa la base $Z$, puede codificar los bits en $\left|0\right\rangle$ y $\left|1\right\rangle$; si usa la base $X$, en $\left|+\right\rangle$ y $\left|-\right\rangle$; y si usa la base $Y$, en los dos autoestados de la matriz de Pauli $Y$ \citep{pauli1927,bruss1998}. Estas tres parejas de estados forman seis posibles señales cuánticas, de donde procede el nombre del protocolo \citep{bruss1998}.
+En cada ronda, Alice elige aleatoriamente un bit clásico y una de tres bases de preparación. Si usa la base $Z$, puede codificar los bits en $\left|0\right\rangle$ y $\left|1\right\rangle$; si usa la base $X$, en $\left|+\right\rangle$ y $\left|-\right\rangle$; y si usa la base $Y$, en los dos autoestados de la matriz de Pauli $Y$ \citep{pauli1927,bruss1998}. Estas tres parejas de estados forman seis posibles señales cuánticas, de donde procede el nombre del protocolo \citep{bruss1998}.
 
-Bob, sin conocer la elección de Alicia, selecciona también al azar una de las tres bases y mide el cúbit recibido. La regla operativa es la misma que en BB84: cuando ambos usan la misma base, el resultado de Bob coincide con el bit preparado por Alicia en un canal ideal; cuando usan bases distintas, el resultado no se conserva para la clave porque las bases mutuamente no sesgadas producen resultados uniformemente aleatorios entre sí \citep{schwinger1960,bennett1984}.
+Bob, sin conocer la elección de Alice, selecciona también al azar una de las tres bases y mide el cúbit recibido. La regla operativa es la misma que en BB84: cuando ambos usan la misma base, el resultado de Bob coincide con el bit preparado por Alice en un canal ideal; cuando usan bases distintas, el resultado no se conserva para la clave porque las bases mutuamente no sesgadas producen resultados uniformemente aleatorios entre sí \citep{schwinger1960,bennett1984}.
 
-Después de muchas rondas, Alicia y Bob comunican públicamente las bases usadas mediante un canal clásico autenticado, pero no revelan los valores de todos los bits \citep{bennett1984}. Solo conservan las rondas en las que las bases coinciden; como hay tres bases equiprobables, la fracción ideal de rondas conservadas es aproximadamente un tercio \citep{bruss1998}. A partir de una muestra de esas rondas estiman la tasa de error cuántico, descartan la ejecución si el error es demasiado alto y, si continúa el protocolo, aplican reconciliación de información y amplificación de privacidad, técnicas introducidas en criptografía cuántica y clásica moderna por \cite{brassard1994}, y por \cite{bennett1995}, respectivamente.
+Después de muchas rondas, Alice y Bob comunican públicamente las bases usadas mediante un canal clásico autenticado, pero no revelan los valores de todos los bits \citep{bennett1984}. Solo conservan las rondas en las que las bases coinciden; como hay tres bases equiprobables, la fracción ideal de rondas conservadas es aproximadamente un tercio \citep{bruss1998}. A partir de una muestra de esas rondas estiman la tasa de error cuántico, descartan la ejecución si el error es demasiado alto y, si continúa el protocolo, aplican reconciliación de información y amplificación de privacidad, técnicas introducidas en criptografía cuántica y clásica moderna por \cite{brassard1994}, y por \cite{bennett1995}, respectivamente.
 
 \begin{figure}[h]
     \centering
@@ -25,11 +25,11 @@ Después de muchas rondas, Alicia y Bob comunican públicamente las bases usadas
         proceso/.style={draw, rounded corners, align=center, minimum width=4.4cm, minimum height=0.85cm},
         flecha/.style={-{Latex[length=2mm]}, thick}
     ]
-        \node[paso] (alice-prep) {Alicia\\elige bit y base\\$X$, $Y$ o $Z$};
+        \node[paso] (alice-prep) {Alice\\elige bit y base\\$X$, $Y$ o $Z$};
         \node[canal, right=of alice-prep] (quantum-channel) {Canal cuántico\\uno de seis estados};
         \node[paso, right=of quantum-channel] (bob-measure) {Bob\\elige base y mide\\$X$, $Y$ o $Z$};
 
-        \node[paso, below=of alice-prep] (alice-basis) {Alicia\\anuncia su base};
+        \node[paso, below=of alice-prep] (alice-basis) {Alice\\anuncia su base};
         \node[canal, right=of alice-basis] (classical-channel) {Canal clásico\\autenticado};
         \node[paso, right=of classical-channel, xshift=0.77cm] (bob-basis) {Bob\\anuncia su base};
 
@@ -64,7 +64,7 @@ La Figura~\ref{fig:seis_estados_flujo} muestra que el cambio esencial respecto a
 
 \subsection{Limitaciones y riesgos}
 \begin{itemize}
-    \item En la versión equiprobable, solo se conserva alrededor de un tercio de las rondas, porque Alicia y Bob deben coincidir en una de tres bases \citep{bruss1998}.
+    \item En la versión equiprobable, solo se conserva alrededor de un tercio de las rondas, porque Alice y Bob deben coincidir en una de tres bases \citep{bruss1998}.
     \item Requiere preparar y medir también los estados de la base $Y$, lo que añade exigencias experimentales frente a implementaciones que solo usan dos bases \citep{pauli1927,bruss1998}.
     \item El modelo ideal presupone que cada ronda queda descrita por un único sistema de dos niveles preparado en una de las seis señales del protocolo; si esa hipótesis se relaja, el análisis de seguridad deja de coincidir con la formulación teórica original \citep{bennett1984,bruss1998}.
     \item La seguridad práctica depende de que los dispositivos reales representen fielmente el modelo teórico, especialmente en detectores y moduladores \citep{bruss1998,bechmann1999}.
@@ -72,14 +72,14 @@ La Figura~\ref{fig:seis_estados_flujo} muestra que el cambio esencial respecto a
 
 \subsection{Ejemplo práctico}
 
-Supóngase que Alicia quiere generar una clave breve para compartir un resultado preliminar con Bob. En una ejecución reducida de nueve rondas, Alicia elige bits y bases entre $X$, $Y$ y $Z$, prepara uno de los seis estados del protocolo y lo envía por el canal cuántico \citep{bruss1998}. Bob mide cada cúbit en una base elegida al azar. Tras la transmisión, ambos anuncian únicamente las bases y conservan solo las rondas coincidentes, siguiendo el procedimiento de cribado introducido en BB84 \citep{bennett1984}.
+Supóngase que Alice quiere generar una clave breve para compartir un resultado preliminar con Bob. En una ejecución reducida de nueve rondas, Alice elige bits y bases entre $X$, $Y$ y $Z$, prepara uno de los seis estados del protocolo y lo envía por el canal cuántico \citep{bruss1998}. Bob mide cada cúbit en una base elegida al azar. Tras la transmisión, ambos anuncian únicamente las bases y conservan solo las rondas coincidentes, siguiendo el procedimiento de cribado introducido en BB84 \citep{bennett1984}.
 
 \begin{table}[h]
     \centering
     \scriptsize
     \begin{tabular}{c c c c c c c c}
         \hline\hline
-        Ronda & Bit de Alicia & Base de Alicia & Estado & Base de B & Bit de Bob & ¿Coinciden? & Resultado \\
+        Ronda & Bit de Alice & Base de Alice & Estado & Base de B & Bit de Bob & ¿Coinciden? & Resultado \\
         \hline
         1 & 0 & $Z$ & $|0\rangle$ & $Z$ & 0 & Sí & Se conserva \\
         2 & 1 & $X$ & $|-\rangle$ & $Y$ & -- & No & Se descarta \\
@@ -96,6 +96,6 @@ Supóngase que Alicia quiere generar una clave breve para compartir un resultado
     \label{tab:seis_estados_ejemplo}
 \end{table}
 
-En la Tabla~\ref{tab:seis_estados_ejemplo}, las rondas 1, 3, 5, 7 y 9 sobreviven al cribado porque las bases de Alicia y Bob coinciden; esta comparación pública de bases procede de BB84 y se aplica aquí al alfabeto de seis estados. En el modelo ideal de preparación y medida, cuando Alicia y Bob usan la misma base, Bob obtiene el mismo valor preparado por Alicia; por eso, en el ejemplo, la clave bruta queda formada por los bits $0,0,0,1,1$ \citep{bennett1984,bruss1998}. Las rondas restantes no aportan bits a la clave porque Bob midió en una base distinta; en bases mutuamente no sesgadas, esa medición no determina el bit preparado \citep{schwinger1960}. Para comprobar si hubo ruido o espionaje, Alicia y Bob podrían revelar una parte de las posiciones conservadas y calcular la tasa de error cuántico, tal como se plantea en BB84 \citep{bennett1984}; si el error observado es compatible con el umbral aceptado, continuarían con reconciliación de información y amplificación de privacidad \citep{brassard1994,bennett1995}.
+En la Tabla~\ref{tab:seis_estados_ejemplo}, las rondas 1, 3, 5, 7 y 9 sobreviven al cribado porque las bases de Alice y Bob coinciden; esta comparación pública de bases procede de BB84 y se aplica aquí al alfabeto de seis estados. En el modelo ideal de preparación y medida, cuando Alice y Bob usan la misma base, Bob obtiene el mismo valor preparado por Alice; por eso, en el ejemplo, la clave bruta queda formada por los bits $0,0,0,1,1$ \citep{bennett1984,bruss1998}. Las rondas restantes no aportan bits a la clave porque Bob midió en una base distinta; en bases mutuamente no sesgadas, esa medición no determina el bit preparado \citep{schwinger1960}. Para comprobar si hubo ruido o espionaje, Alice y Bob podrían revelar una parte de las posiciones conservadas y calcular la tasa de error cuántico, tal como se plantea en BB84 \citep{bennett1984}; si el error observado es compatible con el umbral aceptado, continuarían con reconciliación de información y amplificación de privacid ... (very long line, trimmed to 1000 chars)
 
-Si Eva intercepta los estados sin conocer la base, debe escoger una medición entre $X$, $Y$ o $Z$, que son las tres bases del protocolo de seis estados \citep{bruss1998}. Cuando elige una base distinta de la usada por Alicia, la incompatibilidad de medidas asociada a los observables de \cite{pauli1927} y a las bases mutuamente no sesgadas altera estadísticamente el estado reenviado a Bob \citep{schwinger1960}. Al repetirse este efecto en muchas rondas, la muestra pública de comprobación revela un incremento de errores, mecanismo ya presente en BB84 y reforzado aquí por el uso simétrico de tres bases \citep{bennett1984,bruss1998}.
+Si Eva intercepta los estados sin conocer la base, debe escoger una medición entre $X$, $Y$ o $Z$, que son las tres bases del protocolo de seis estados \citep{bruss1998}. Cuando elige una base distinta de la usada por Alice, la incompatibilidad de medidas asociada a los observables de \cite{pauli1927} y a las bases mutuamente no sesgadas altera estadísticamente el estado reenviado a Bob \citep{schwinger1960}. Al repetirse este efecto en muchas rondas, la muestra pública de comprobación revela un incremento de errores, mecanismo ya presente en BB84 y reforzado aquí por el uso simétrico de tres bases \citep{bennett1984,bruss1998}.

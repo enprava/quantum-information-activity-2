@@ -1,22 +1,92 @@
-\section{MDI-QKD}
-
+\section{Protocolo MDI-QKD}
+ 
+Los protocolos de preparación y medida, como BB84 \citep{bennett1984} y B92 \citep{bennett1992}, y los basados en entrelazamiento, como E91 \citep{ekert1991}, asumen en sus modelos de seguridad que los detectores de fotones se comportan según sus especificaciones teóricas. Esta suposición resultó ser una vulnerabilidad práctica crítica: \cite{lydersen2010} demostraron experimentalmente que era posible cegar los detectores de avalancha de fotones únicos mediante iluminación intensa, tomando control efectivo de las mediciones de Bob sin introducir errores estadísticos detectables. El protocolo MDI-QKD (\emph{Measurement-Device-Independent Quantum Key Distribution}), propuesto por \cite{lo2012}, elimina esta clase de ataques de forma estructural al delegar toda la medición en un nodo intermedio cuya honestidad no se requiere.
+ 
 \subsection{Contexto y propósito}
-
+ 
+El protocolo MDI-QKD fue propuesto por \cite{lo2012} como respuesta directa a los ataques de canal lateral sobre detectores demostrados por \cite{lydersen2010}. La idea central es que Alice y Bob no realizan ninguna medición sobre los fotones del otro; en cambio, ambos preparan y envían estados cuánticos hacia un nodo central, denominado Charlie, que realiza una medición de Bell conjunta y anuncia el resultado públicamente \citep{lo2012,braunstein2012}. La clave se deduce a partir de ese anuncio sin que la seguridad dependa en absoluto de la honestidad ni de la calibración de Charlie \citep{lo2012,curty2014}.
+ 
+Esta arquitectura elimina por completo el lado del detector del modelo de amenaza \citep{lo2012}: incluso si Charlie es un adversario con control total sobre sus equipos, no puede obtener información sobre las claves individuales de Alice o Bob a partir de la medición de Bell, pues ese resultado solo revela una relación entre los dos cúbits, no sus valores por separado \citep{lo2012,braunstein2012}. MDI-QKD es así el complemento natural de los protocolos con estados señuelo de \cite{lo2005} y \cite{wang2005}, que protegen el lado de la fuente frente a ataques de división del número de fotones \citep{hwang2003}.
+ 
 \subsection{Funcionamiento del protocolo}
-
-
+ 
+En cada ronda, Alice y Bob preparan de forma independiente un cúbit cada uno, eligiendo al azar un bit y una base de codificación, siguiendo la misma lógica que en BB84 \citep{bennett1984,lo2012}. Ambos envían sus cúbits simultáneamente a Charlie a través de sus respectivos canales cuánticos. Charlie realiza una medición de Bell conjunta sobre los dos fotones recibidos e intenta proyectarlos sobre uno de los cuatro estados de Bell, $|\Phi^\pm\rangle$ o $|\Psi^\pm\rangle$, y anuncia públicamente cuál ha obtenido, o si la medición ha fallado por pérdidas u otras imperfecciones \citep{lo2012,braunstein2012}.
+ 
+Alice y Bob usan el canal clásico autenticado para comparar las bases empleadas en cada ronda, siguiendo el procedimiento de cribado de BB84 \citep{bennett1984}. Las rondas con bases distintas se descartan. En las rondas con bases coincidentes, el resultado de Bell anunciado por Charlie permite a Bob deducir, a partir de su propio bit y del anuncio, cuál fue el bit de Alice, salvo posiblemente una inversión de bit predecible y corregible \citep{lo2012,curty2014}. La clave bruta resultante se somete a estimación de error, reconciliación de información y amplificación de privacidad de la misma forma que en BB84 \citep{brassard1994,bennett1995,scarani2009}.
+ 
+\begin{figure}[h]
+    \centering
+    \begin{tikzpicture}[
+        node distance=0.9cm and 1.2cm,
+        paso/.style={draw, rounded corners, align=center, minimum width=3.2cm, minimum height=0.8cm},
+        charlie/.style={draw, rounded corners, align=center, minimum width=3.2cm, minimum height=0.8cm, fill=gray!20},
+        canal/.style={draw, rounded corners, align=center, minimum width=2.8cm, minimum height=0.8cm, fill=gray!10},
+        proceso/.style={draw, rounded corners, align=center, minimum width=4.4cm, minimum height=0.85cm},
+        flecha/.style={-{Latex[length=2mm]}, thick}
+    ]
+        \node[paso] (a1) {Alice\\elige bit y base\\prepara cúbit};
+        \node[charlie, right=1.3cm of a1] (ch) {Charlie\\(no confiable)\\medición de Bell};
+        \node[paso, right=1.3cm of ch] (b1) {Bob\\elige bit y base\\prepara cúbit};
+ 
+        \node[canal, below=of ch] (anuncio) {Charlie anuncia\\resultado de Bell};
+ 
+        \node[proceso, below=of anuncio] (sift) {Alice y Bob comparan bases\\por canal clásico autenticado};
+ 
+        \node[proceso, below=of sift] (post) {Estimación de error, reconciliación\\y amplificación de privacidad};
+        \node[proceso, below=of post, fill=gray!10] (key) {Clave final compartida};
+ 
+        \draw[flecha] (a1) -- (ch) node[midway, above, font=\small] {cúbit};
+        \draw[flecha] (b1) -- (ch) node[midway, above, font=\small] {cúbit};
+        \draw[flecha] (ch) -- (anuncio);
+        \draw[flecha] (anuncio) -- (sift);
+        \draw[flecha] (sift) -- (post);
+        \draw[flecha] (post) -- (key);
+    \end{tikzpicture}
+    \caption[Esquema operativo de MDI-QKD]{Diagrama de flujo simplificado del protocolo MDI-QKD. Fuente: elaboración propia.}
+    \label{fig:mdiqkd_flujo}
+\end{figure}
+ 
+La Figura~\ref{fig:mdiqkd_flujo} ilustra la diferencia estructural respecto a BB84 \citep{bennett1984}: los detectores no están en poder de Bob sino de Charlie, que puede ser un adversario. Charlie no tiene acceso a los bits individuales de Alice ni de Bob; su anuncio solo revela una relación entre los dos cúbits \citep{lo2012,braunstein2012}. Si Charlie manipula la medición, o si un adversario controla completamente sus detectores, el efecto se manifiesta como un aumento en la tasa de error observable, que Alice y Bob detectan durante la estimación, tal como ocurre con la intervención de Eva en BB84 \citep{bennett1984,lo2012}. La técnica de estados señuelo de \cite{lo2005} y \cite{wang2005} puede aplicarse directamente para proteger también el lado de la fuente, lo que hace a MDI-QKD apto para implementaciones con láseres atenuados \citep{lo2012,curty2014}.
+ 
 \subsection{Ventajas principales}
 \begin{itemize}
-    \item a
-    \item b
-    \item c
+    \item Elimina por completo la necesidad de confiar en los detectores: toda vulnerabilidad asociada al lado de medición, incluidos los ataques de cegado del detector demostrados por \cite{lydersen2010}, queda excluida del modelo de amenaza \citep{lo2012}.
+    \item El nodo de medición Charlie puede ser operado por un tercero no confiable o incluso por un adversario, lo que permite arquitecturas de red donde los nodos intermedios no necesitan ser seguros \citep{lo2012,braunstein2012}.
+    \item Es compatible con fuentes láser atenuadas y la técnica de estados señuelo de \cite{lo2005} y \cite{wang2005}, lo que permite implementaciones prácticas sin necesidad de fuentes de un único fotón \citep{lo2012,curty2014}.
+    \item Proporciona una base para redes QKD en topología estrella, donde múltiples usuarios comparten un nodo central de medición sin que ese nodo tenga acceso a ninguna clave \citep{curty2014,lo2014}.
 \end{itemize}
-
+ 
 \subsection{Limitaciones y riesgos}
 \begin{itemize}
-    \item a
-    \item b
-    \item c
+    \item La tasa de generación de clave es significativamente menor que en BB84 \citep{bennett1984}, principalmente porque la probabilidad de detección en coincidencia disminuye con las pérdidas de los dos canales simultáneamente, lo que penaliza especialmente las distancias largas \citep{lo2012,curty2014}.
+    \item La implementación experimental requiere que los fotones emitidos por Alice y Bob sean indistinguibles en todos sus grados de libertad en el momento de llegar a Charlie, lo que impone requisitos estrictos de sincronización temporal y control espectral \citep{lo2012,gisin2002}.
+    \item Aunque MDI-QKD elimina los ataques al lado del detector, no cubre vulnerabilidades del lado de la preparación, como imperfecciones en la modulación de estados o ataques de canal lateral sobre las fuentes de Alice y Bob \citep{scarani2009,curty2014}.
+    \item La necesidad de sincronización precisa entre las dos fuentes y el nodo de Charlie añade complejidad operativa y puede reducir la estabilidad del sistema en entornos de despliegue real \citep{lo2012,lo2014}.
 \end{itemize}
-
+ 
 \subsection{Ejemplo práctico}
+ 
+Supóngase que Alice y Bob desean establecer una clave utilizando como nodo de medición un equipo de Charlie cuya fiabilidad no puede garantizarse. En una ejecución reducida de seis rondas, Alice y Bob preparan independientemente un cúbit en cada ronda usando la misma lógica de elección de bit y base que en BB84 \citep{bennett1984}, y los envían simultáneamente a Charlie. Charlie realiza la medición de Bell e informa públicamente del resultado obtenido o del fallo de detección.
+ 
+\begin{table}[h]
+    \centering
+    \small
+    \begin{tabular}{c c c c c c c c}
+        \hline\hline
+        Ronda & Bit Al. & Base Al. & Bit B. & Base B. & Res. Charlie & ¿Bases coinciden? & ¿Se conserva? \\
+        \hline
+        1 & 0 & Rect. & 1 & Rect. & $|\Psi^+\rangle$ & Sí  & Sí \\
+        2 & 1 & Diag. & 0 & Rect. & $|\Phi^-\rangle$ & No  & No \\
+        3 & 0 & Rect. & 0 & Rect. & Fallo            & Sí  & No \\
+        4 & 1 & Diag. & 0 & Diag. & $|\Phi^+\rangle$ & Sí  & Sí \\
+        5 & 0 & Rect. & 1 & Diag. & $|\Psi^-\rangle$ & No  & No \\
+        6 & 1 & Diag. & 1 & Diag. & $|\Phi^+\rangle$ & Sí  & Sí \\
+        \hline
+    \end{tabular}
+    \caption[Ejemplo de cribado en MDI-QKD]{Ejemplo simplificado de cribado en MDI-QKD. Fuente: elaboración propia.}
+    \label{tab:mdiqkd_ejemplo}
+\end{table}
+ 
+En el caso de la Tabla~\ref{tab:mdiqkd_ejemplo}, se conservan las rondas 1, 4 y 6, que son aquellas en las que Alice y Bob usaron la misma base y Charlie obtuvo una detección válida. La ronda 3 se descarta a pesar de que las bases coinciden, porque Charlie no logró una detección en coincidencia, lo que ocurre con frecuencia en implementaciones reales con láseres atenuados y pérdidas de canal \citep{lo2012,curty2014}. A partir del resultado de Bell anunciado por Charlie en cada ronda conservada, Bob aplica o no una corrección de bit sobre su valor para sincronizar su clave bruta con la de Alice, según la correspondencia definida por el protocolo \citep{lo2012}.
+ 
+Si Charlie hubiera manipulado las mediciones o los anuncios, o si un adversario hubiera interceptado los cúbits en tránsito, los estados que llegan a Charlie ya no serían los preparados por Alice y Bob, y los resultados de Bell obtenibles serían distintos de los esperados \citep{lo2012,braunstein2012}. Esto se traduce en un aumento de la tasa de error en la muestra que Alice y Bob revelan públicamente durante la estimación, mecanismo análogo al que permite detectar la intervención de Eva en BB84 \citep{bennett1984}. A diferencia de ese protocolo, sin embargo, ningún atacante puede explotar las imperfecciones de los detectores para manipular el resultado sin dejar huella estadística, ya que los detectores pertenecen precisamente al nodo no confiable cuya manipulación se quiere detectar \citep{lo2012,lydersen2010}. En una implementación real se usarían miles de rondas y la técnica de estados señuelo de \cite{lo2005} para estimar con precisión los parámetros del canal. Este ejemplo reducido tiene únicamente como propósito ilustrar la lógica de preparación simultánea, medición de Bell delegada en un nodo no confiable, y cribado por coincidencia de bases que caracteriza al protocolo MDI-QKD \citep{lo2012}.

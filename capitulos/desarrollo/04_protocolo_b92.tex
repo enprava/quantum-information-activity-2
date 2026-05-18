@@ -1,10 +1,10 @@
 \section{Protocolo B92}
 
-El protocolo B92 representa un hito fundamental en la criptografía cuántica al demostrar que la seguridad no depende necesariamente de la cantidad de estados utilizados, sino de la propiedad de no ortogonalidad. En particular, este protocolo pone de manifiesto que incluso un conjunto mínimo de dos estados no ortogonales es suficiente para garantizar seguridad frente a un posible espía, debido a la imposibilidad de distinguirlos perfectamente sin introducir perturbaciones detectables (véase, por ejemplo, \cite{gisin2002}).
+El protocolo B92, nombrado así por \cite{bennett1992}, representa un hito fundamental en la criptografía cuántica al demostrar que la seguridad no depende necesariamente de la cantidad de estados utilizados, sino de la propiedad de no ortogonalidad. En particular, este protocolo pone de manifiesto que incluso un conjunto mínimo de dos estados no ortogonales es suficiente para garantizar seguridad frente a un posible espía, debido a la imposibilidad de distinguirlos perfectamente sin introducir perturbaciones detectables \citep{gisin2002}.
 
 \subsection{Contexto y propósito}
 
-El protocolo B92 \citep{bennett1992} es una variante simplificada de BB84 \citep{bennett1984} que emplea únicamente dos estados cuánticos no ortogonales \citep{schrodinger1926quantisierung} para codificar la información. Esta reducción disminuye la complejidad conceptual y experimental del sistema, manteniendo la seguridad basada en la imposibilidad de distinguir dichos estados sin introducir perturbaciones.
+El protocolo B92 es una variante simplificada de BB84 \citep{bennett1984} que emplea únicamente dos estados cuánticos no ortogonales \citep{schrodinger1926} para codificar la información. Esta reducción disminuye la complejidad conceptual y experimental del sistema, manteniendo la seguridad basada en la imposibilidad de distinguir dichos estados sin introducir perturbaciones.
 
 \subsection{Funcionamiento del protocolo}
 
@@ -27,14 +27,14 @@ Estos estados son no ortogonales, lo que significa que no pueden distinguirse co
     \item La base $\mathcal{B}_+ = \{|{+}\rangle, |{-}\rangle\}$.
 \end{itemize}
 
-Debido a la no ortogonalidad de los estados enviados por Alicia, en muchos casos 
+Debido a la no ortogonalidad de los estados enviados por Alice, en muchos casos 
 Bob no puede determinar con certeza qué estado fue enviado. Sin embargo, en 
 determinadas situaciones obtiene un resultado concluyente:
 
 \begin{itemize}
-    \item Si detecta $|1\rangle$, sabe que Alicia no envió $|0\rangle$, por lo 
+    \item Si detecta $|1\rangle$, sabe que Alice no envió $|0\rangle$, por lo 
     que deduce que el bit era 1.
-    \item Si detecta $|{-}\rangle$, sabe que Alicia no envió $|{+}\rangle$, por 
+    \item Si detecta $|{-}\rangle$, sabe que Alice no envió $|{+}\rangle$, por 
     lo que deduce que el bit era 0.
 \end{itemize}
 
@@ -55,14 +55,14 @@ A partir de esta información:
   
 El resultado de este proceso es una secuencia común de bits denominada \textit{clave en bruto}.  
   
-Posteriormente, Alice y Bob realizan una comparación parcial de esta clave y seleccionan aleatoriamente un subconjunto de bits y los comparan públicamente para estimar la tasa de error \textit{QBER} \citep{nielsen2010quantum}.  
+Posteriormente, Alice y Bob realizan una comparación parcial de esta clave y seleccionan aleatoriamente un subconjunto de bits y los comparan públicamente para estimar la tasa de error \textit{QBER} \citep{nielsen2010}.  
   
 \begin{itemize}  
     \item Si los valores coinciden en la mayoría de los casos, el canal se considera seguro.  
     \item Si aparece un número significativo de discrepancias, se concluye que ha habido interferencias o un posible ataque, y el protocolo se aborta.  
 \end{itemize}  
   
-Este procedimiento permite detectar la presencia de un espía, ya que cualquier medición no autorizada introduce perturbaciones en los estados cuánticos, lo que se refleja en un aumento del error en la clave compartida. Como se describe detalladamente en \cite{nielsen2010}, esta detección es posible porque las leyes de la mecánica cuántica impiden obtener información sobre el estado sin modificarlo inevitablemente.
+Este procedimiento permite detectar la presencia de un espía, ya que cualquier medición no autorizada introduce perturbaciones en los estados cuánticos, lo que se refleja en un aumento del error en la clave compartida. Como describen detalladamente \cite{nielsen2010}, esta detección es posible porque las leyes de la mecánica cuántica impiden obtener información sobre el estado sin modificarlo inevitablemente.
 
 \subsubsection{Codificación de estados}
 En la fase inicial, Alice transforma la información binaria clásica en estados cuánticos mediante la preparación de estados con polarizaciones específicas. A diferencia de otros protocolos, el esquema B92 utiliza una base de estados no ortogonales para representar los valores lógicos, tal como se detalla en la Tabla~\ref{tab:codificacion_b92}, vinculando cada bit a un estado de polarización horizontal o diagonal.
@@ -108,7 +108,7 @@ Con el fin de facilitar la comprensión de la lógica secuencial que rige el pro
 \begin{tikzpicture}[node distance=3.2cm, every node/.style={draw, rectangle, rounded corners, align=center, font=\small, minimum height=1.2cm}]
 
 % Nodos
-\node (alice) {Alicia envía\\$\ket{0}$ o $\ket{+}$};
+\node (alice) {Alice envía\\$\ket{0}$ o $\ket{+}$};
 \node (bob) [right of=alice] {Bob mide en\\base aleatoria};
 \node (decision) [right of=bob] {¿Resultado\\concluyente?};
 \node (yes) [right of=decision, xshift=0.5cm] {Guardar bit y\\comunicar pos.};
@@ -129,12 +129,12 @@ Como se observa en la Figura~\ref{fig:flujo_b92_horizontal}, el flujo resalta el
 
 \subsection{Ventajas principales}
 
-El protocolo B92 presenta una serie de ventajas que lo sitúan como una alternativa relevante dentro del panorama de los protocolos DV-QKD, ofreciendo un esquema simplificado que mantiene garantías de seguridad incondicional frente a ataques generales \citep{tamaki2003}, destacando principalmente por su extrema simplicidad al requerir únicamente dos estados cuánticos para su funcionamiento. Esta característica constituye su mayor fortaleza, ya que permite una implementación experimental mucho más sencilla que la del protocolo BB84, reduciendo significativamente la complejidad técnica y el diseño del hardware necesario. Asimismo, su seguridad se apoya en un fundamento teórico directo basado en la no ortogonalidad de los estados, permitiendo simplificar la arquitectura del sistema sin comprometer los principios esenciales de la mecánica cuántica que garantizan la confidencialidad en el intercambio de la clave.
+El protocolo B92 \citep{bennett1992} presenta una serie de ventajas que lo sitúan como una alternativa relevante dentro del panorama de los protocolos DV-QKD, ofreciendo un esquema simplificado que mantiene garantías de seguridad incondicional frente a ataques generales \citep{tamaki2003}, destacando principalmente por su extrema simplicidad al requerir únicamente dos estados cuánticos para su funcionamiento. Esta característica constituye su mayor fortaleza, ya que permite una implementación experimental mucho más sencilla que la del protocolo BB84 \citep{bennett1984}, reduciendo significativamente la complejidad técnica y el diseño del hardware necesario. Asimismo, su seguridad se apoya en un fundamento teórico directo basado en la no ortogonalidad de los estados, permitiendo simplificar la arquitectura del sistema sin comprometer los principios esenciales de la mecánica cuántica que garantizan la confidencialidad en el intercambio de la clave.
 
 %------------------------------------------------------
 
 \subsection{Limitaciones y riesgos}
-A pesar de su simplicidad, el protocolo B92 presenta limitaciones que condicionan su uso en entornos reales. Su baja eficiencia en la generación de clave, cercana al 25\% (véase Tabla~\ref{tab:comparativa_b92_bb84}), junto con una mayor sensibilidad al ruido del canal, lo sitúan en desventaja frente a alternativas más robustas, como BB84 con estados señuelo, especialmente en implementaciones de larga distancia o en canales con alta atenuación. En este contexto, \cite{wang2005} mostró que el uso de técnicas de estados señuelo permite reforzar la seguridad de los sistemas prácticos frente a los ataques de tipo \textit{Photon Number Splitting} (PNS), cuya base teórica y peligrosidad en fuentes no ideales fueron formalmente establecidas por \cite{brassard2000pns}. Esta vulnerabilidad es crítica en B92, ya que las imperfecciones en la fuente de los estados pueden permitir a un adversario obtener información de la clave sin introducir el nivel de ruido previsto por el protocolo original.
+A pesar de su simplicidad, el protocolo B92 presenta limitaciones que condicionan su uso en entornos reales. Su baja eficiencia en la generación de clave, cercana al 25\% (véase Tabla~\ref{tab:comparativa_b92_bb84}), junto con una mayor sensibilidad al ruido del canal, lo sitúan en desventaja frente a alternativas más robustas, como BB84 con estados señuelo \citep{hwang2003,wang2005, lo2005}, especialmente en implementaciones de larga distancia o en canales con alta atenuación. En este contexto, \cite{wang2005} mostró que el uso de técnicas de estados señuelo permite reforzar la seguridad de los sistemas prácticos frente a los ataques de tipo \textit{Photon Number Splitting} (PNS), cuya base teórica y peligrosidad en fuentes no ideales fueron formalmente establecidas por \cite{brassard2000pns}. Esta vulnerabilidad es crítica en B92, ya que las imperfecciones en la fuente de los estados pueden permitir a un adversario obtener información de la clave sin introducir el nivel de ruido previsto por el protocolo original.
 
 \begin{table}[h!]
 \label{tab:comparativa_b92_bb84}
@@ -148,7 +148,6 @@ Bases & Implícitas & 2 explícitas \\
 Eficiencia & $\sim 25\%$ & $\sim 50\%$ \\
 Complejidad & Baja & Media \\
 Robustez al ruido & Menor & Mayor \\
-Uso práctico & Limitado & Estándar \\
 \hline
 \end{tabular}
 \caption{Comparación entre B92 y BB84. Fuente: elaboración propia.}
