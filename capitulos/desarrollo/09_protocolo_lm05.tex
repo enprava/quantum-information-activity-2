@@ -1,22 +1,102 @@
 \section{Protocolo LM05}
 
+El protocolo BB84 de \cite{bennett1984} y su simplificación B92 de \cite{bennett1992} se basan en una arquitectura de comunicación unidireccional: Alice prepara estados cuánticos y los envía a Bob a través de un canal. El protocolo LM05, propuesto por \cite{lucamarini2005}, rompe con esta estructura clásica al introducir el concepto de comunicación cuántica bidireccional (o de dos vías) determinista. En este esquema, el cúbit viaja de Bob a Alice y, tras ser manipulado por ella, regresa a Bob. A diferencia de protocolos bidireccionales previos como el \textit{Ping-Pong} \citep{bostrom2002}, la gran innovación de LM05 es que logra una transmisión segura e independiente sin necesidad de utilizar el entrelazamiento cuántico como recurso.
+
 \subsection{Contexto y propósito}
+
+El protocolo LM05 fue propuesto por \cite{lucamarini2005} para solventar una de las principales ineficiencias del protocolo BB84 \citep{bennett1984}: el descarte masivo de cúbits debido a la falta de coincidencia en las bases de medida. En LM05, como Bob es quien prepara el estado inicial y quien lo vuelve a medir al final del proceso, la base de preparación y la de medida siempre coinciden. Esto permite que, teóricamente, cada cúbit intercambiado en el modo de mensaje contribuya a la generación de la clave, aumentando drásticamente la eficiencia del protocolo.
+
+La seguridad del sistema ya no descansa en la elección aleatoria de bases independientes por parte de dos usuarios, sino en la capacidad de Alice para alternar aleatoriamente entre un modo de codificación de mensaje y un modo de control \citep{lucamarini2005}. Cualquier espía (Eva) que intente interceptar el cúbit, ya sea en el viaje de ida (Bob a Alice) o en el de vuelta (Alice a Bob), introducirá perturbaciones en el estado cuántico que serán detectadas inevitablemente durante las rondas de control, garantizando así la confidencialidad de la clave mediante los principios fundamentales de la mecánica cuántica \citep{wootters1982}.
 
 \subsection{Funcionamiento del protocolo}
 
+El ciclo comienza cuando Bob prepara un cúbit en uno de los cuatro estados estándar mutuamente insesgados: $\{|0\rangle, |1\rangle, |+\rangle, |-\rangle\}$, y se lo envía a Alice a través del canal cuántico \citep{lucamarini2005}. Al recibirlo, Alice decide aleatoriamente operar en uno de dos modos posibles: modo de mensaje (CM) o modo de control (CC).
+
+Si Alice elige el modo de mensaje, codifica su bit de información aplicando una operación unitaria al cúbit recibido: aplica la matriz identidad $I$ para codificar un $0$ lógico (dejando el estado intacto), o aplica una transformación $U$ (típicamente análoga a la matriz de Pauli $i\sigma_y$) para codificar un $1$ lógico, la cual invierte el estado independientemente de la base en la que Bob lo haya preparado. Tras operar, devuelve el cúbit a Bob. Bob mide el cúbit en la misma base en la que lo preparó; si el estado es el mismo, registra un $0$, y si ha cambiado al estado ortogonal, registra un $1$ \citep{lucamarini2005}.
+
+Si Alice elige el modo de control, mide el cúbit recibido en una base aleatoria (rectilínea o diagonal) y prepara un nuevo cúbit en el estado medido para devolvérselo a Bob. Tras la transmisión cuántica, Alice anuncia públicamente en qué rondas actuó en modo de control y qué bases y resultados obtuvo, lo que permite a Bob contrastar si hubo alteraciones en el canal (presencia de Eva).
+
+\begin{figure}[h]
+    \centering
+    \begin{tikzpicture}[
+        node distance=1.2cm and 1.5cm,
+        paso/.style={draw, rounded corners, align=center, minimum width=3.2cm, minimum height=0.8cm},
+        canal/.style={draw, rounded corners, align=center, minimum width=2.8cm, minimum height=0.8cm, fill=gray!10},
+        proceso/.style={draw, rounded corners, align=center, minimum width=4.4cm, minimum height=0.85cm},
+        flecha/.style={-{Latex[length=2mm]}, thick}
+    ]
+        \node[paso] (b1) {Bob prepara cúbit\\en base aleatoria};
+        \node[canal, below=of b1] (c1) {Canal cuántico (Ida)};
+        \node[paso, right=1.5cm of c1] (a1) {Alice recibe y elige:\\Modo Mensaje o Control};
+        
+        \node[canal, below=of a1] (c2) {Canal cuántico (Vuelta)};
+        \node[paso, left=1.5cm of c2] (b2) {Bob mide cúbit\\en la base original};
+
+        \node[canal, below=1.2cm of b2, xshift=2.4cm] (c3) {Canal clásico\\autenticado};
+
+        \node[proceso, below=1cm of c3, xshift=-2.4cm] (key) {Modo Mensaje:\\Clave bruta (determinista)};
+        \node[proceso, below=1cm of c3, xshift=+2.4cm] (ctrl) {Modo Control:\\Estimación de error};
+
+        \node[proceso, below=1.3cm of key, xshift=+2.4cm] (post) {Reconciliación y\\amplificación de privacidad};
+        \node[proceso, below=of post, fill=gray!10] (final) {Clave final compartida};
+
+        \draw[flecha] (b1) -- (c1);
+        \draw[flecha] (c1) -- (a1);
+        \draw[flecha] (a1) -- (c2);
+        \draw[flecha] (c2) -- (b2);
+        
+        \draw[flecha] (a1) |- (c3);
+        \draw[flecha] (b2) |- (c3);
+        
+        \draw[flecha] (c3) -- (key);
+        \draw[flecha] (c3) -- (ctrl);
+        \draw[flecha] (key) -- (post);
+        \draw[flecha] (ctrl) -- (post);
+        \draw[flecha] (post) -- (final);
+    \end{tikzpicture}
+    \caption[Esquema operativo de LM05]{Diagrama de flujo simplificado del protocolo bidireccional LM05. Fuente: elaboración propia.}
+    \label{fig:lm05_flujo}
+\end{figure}
+
+La Figura~\ref{fig:lm05_flujo} muestra la arquitectura en "U" característica de LM05. A diferencia de E91, no hay fuente externa; Bob es simultáneamente emisor inicial y receptor final. El canal clásico posterior solo se utiliza para revelar qué rondas fueron de control, efectuar la estimación de la tasa de error cuántico (QBER) y realizar el posprocesado habitual \citep{lucamarini2005,scarani2009}.
 
 \subsection{Ventajas principales}
 \begin{itemize}
-    \item a
-    \item b
-    \item c
+    \item Generación de clave determinista: no se descartan cúbits por incompatibilidad de bases entre emisor y receptor, lo que aumenta teóricamente la eficiencia frente a protocolos unidireccionales como BB84 \citep{lucamarini2005}.
+    \item No requiere entrelazamiento cuántico, simplificando enormemente los requisitos tecnológicos del hardware en comparación con E91 o Ping-Pong \citep{ekert1991,bostrom2002}.
+    \item Bob actúa como su propio emisor y medidor, lo que reduce la necesidad de alinear los sistemas de referencia entre los laboratorios de Alice y Bob con la misma precisión que en otros protocolos.
 \end{itemize}
 
 \subsection{Limitaciones y riesgos}
 \begin{itemize}
-    \item a
-    \item b
-    \item c
+    \item El cúbit debe viajar por el canal dos veces (ida y vuelta), lo que duplica el impacto de la atenuación y las pérdidas del medio de transmisión (como la fibra óptica), reduciendo la distancia máxima operativa.
+    \item La arquitectura bidireccional introduce una vulnerabilidad específica a los ataques de tipo "caballo de Troya" (Trojan-horse attacks): Eva puede inyectar luz en el equipo de Alice para leer qué operación está aplicando, requiriendo el uso de aisladores y detectores de intensidad adicionales \citep{gisin2002}.
+    \item Al ser un protocolo de preparación y medida, su seguridad depende de una calibración perfecta de los dispositivos, a diferencia de la seguridad independiente del dispositivo que ofrece E91 \citep{acin2007}.
 \end{itemize}
 
 \subsection{Ejemplo práctico}
+
+Supóngase que Alice y Bob desean establecer una clave mediante el protocolo LM05 en una ejecución reducida de ocho rondas. Bob prepara aleatoriamente estados en las bases rectilínea ($Z$) o diagonal ($X$) y los envía. Alice decide aleatoriamente si operar en modo mensaje (para transmitir la clave aplicando $I$ o $U$) o en modo control (para medir y reenviar). Tras la comunicación cuántica, Alice anuncia los modos empleados por el canal clásico \citep{lucamarini2005}.
+
+\begin{table}[h]
+    \centering
+    \small
+    \begin{tabular}{c c c c c c c}
+        \hline\hline
+        Ronda & Bob prepara & Modo Alice & Operación/Medida Alice & Bob recibe & Bob deduce & Uso \\
+        \hline
+        1 & $|+\rangle$ & Mensaje (Bit 0) & Aplica identidad $I$ & $|+\rangle$ & Bit 0 & Clave \\
+        2 & $|0\rangle$ & Mensaje (Bit 1) & Aplica inversor $U$ & $|1\rangle$ & Bit 1 & Clave \\
+        3 & $|-\rangle$ & Control & Mide $|-\rangle$, envía $|-\rangle$ & $|-\rangle$ & (Verifica) & Test de error \\
+        4 & $|1\rangle$ & Mensaje (Bit 0) & Aplica identidad $I$ & $|1\rangle$ & Bit 0 & Clave \\
+        5 & $|0\rangle$ & Control & Mide $|+\rangle$, envía $|+\rangle$ & $|+\rangle$ \text{o} $|-\rangle$ & (Descartada) & Test de error \\
+        6 & $|-\rangle$ & Mensaje (Bit 1) & Aplica inversor $U$ & $|+\rangle$ & Bit 1 & Clave \\
+        7 & $|+\rangle$ & Mensaje (Bit 1) & Aplica inversor $U$ & $|-\rangle$ & Bit 1 & Clave \\
+        8 & $|1\rangle$ & Control & Mide $|1\rangle$, envía $|1\rangle$ & $|1\rangle$ & (Verifica) & Test de error \\
+        \hline
+    \end{tabular}
+    \caption[Ejemplo de clasificación de rondas en LM05]{Ejemplo simplificado de rondas en LM05. Fuente: elaboración propia.}
+    \label{tab:lm05_ejemplo}
+\end{table}
+
+En la Tabla~\ref{tab:lm05_ejemplo}, las rondas 1, 2, 4, 6 y 7 corresponden al modo de mensaje. Como Bob conoce el estado inicial, la simple comparación con el estado final le permite deducir con un 100\% de certeza si Alice aplicó $I$ (bit 0) o $U$ (bit 1), conformando directamente la clave bruta \citep{lucamarini2005}. Las rondas 3, 5 y 8 son rondas de control. En la ronda 5, Alice midió en la base equivocada respecto a la de Bob, por lo que el estado se colapsó y Bob obtendrá un resultado aleatorio; estas rondas cruzadas se descartan durante el posprocesado. Sin embargo, en las rondas de control donde las bases de Alice y Bob coinciden (rondas 3 y 8), los resultados deben ser idénticos. Si Eva hubiera interceptado el cúbit en el viaje de ida o de vuelta, habría modificado el estado de estas rondas de control introduciendo una tasa de error (QBER) anómala. Si dicho error supera el umbral de seguridad, Bob y Alice abortan el protocolo por considerar el canal comprometido.
